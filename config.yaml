@@ -1,0 +1,40 @@
+version: "1.0.8"
+slug: owntone
+name: OwnTone (DAAPd)
+description: "OwnTone/MPD music server — MPD protocol on port 6600 + Web UI/DAAP on port 3689"
+description_locale:
+  zh-Hans: "OwnTone/MPD 音乐服务器——MPD 协议（6600）+ Web UI/DAAP 协议（3689）。HA 里用 mpd 集成接入作为媒体播放器，Web UI 在 3689 端口或 HA 侧边栏。"
+url: "https://github.com/owntone/owntone"
+arch:
+  - aarch64
+  - amd64
+audio: true
+init: false
+map:
+  - data:rw
+  - media:rw
+  - share:rw
+options:
+  mpd_port: 6600
+  daap_port: 3689
+  music_dir: /media
+  playlist_dir: /media
+  admin_password: ""
+  autostart: false
+ports:
+  6600/tcp: 6600
+  3689/tcp: 3689
+schema:
+  mpd_port: int
+  daap_port: int
+  music_dir: str
+  playlist_dir: str
+  admin_password: str
+  autostart: bool
+startup: services
+watchdog: tcp://[HOST]:6600
+boot: auto
+ingress: true
+ingress_port: 3689
+panel_icon: mdi:music-note
+panel_title: OwnTone

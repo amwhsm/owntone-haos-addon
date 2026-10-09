@@ -1,0 +1,31 @@
+{
+  "title": "OwnTone (DAAPd)",
+  "description": "OwnTone/MPD music server via DAAPd - MPD protocol (6600) plus DAAP (3689).",
+  "options": {
+    "mpd_port": {
+      "name": "MPD port",
+      "description": "TCP port for the MPD protocol. The HA 'mpd' integration connects here.",
+      "default": 6600
+    },
+    "daap_port": {
+      "name": "DAAP port",
+      "description": "TCP port for DAAP (iTunes/Shairport) streaming.",
+      "default": 3689
+    },
+    "music_dir": {
+      "name": "Music directory",
+      "description": "Host path containing the music library, mounted into the container.",
+      "default": ""
+    },
+    "playlist_dir": {
+      "name": "Playlist directory",
+      "description": "Host path for playlists. Leave empty to use the default under /config.",
+      "default": ""
+    },
+    "autostart": {
+      "name": "Auto start",
+      "description": "Start the add-on when Home Assistant starts.",
+      "default": true
+    }
+  }
+}

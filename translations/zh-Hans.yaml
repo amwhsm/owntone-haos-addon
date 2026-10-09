@@ -1,0 +1,31 @@
+{
+  "title": "OwnTone (DAAPd)",
+  "description": "OwnTone/MPD 音乐服务器（基于 DAAPd）—— MPD 协议（6600）+ DAAP 协议（3689）。",
+  "options": {
+    "mpd_port": {
+      "name": "MPD 端口",
+      "description": "MPD 协议 TCP 端口，HA 的 mpd 集成从这里连接。",
+      "default": 6600
+    },
+    "daap_port": {
+      "name": "DAAP 端口",
+      "description": "DAAP（iTunes/Shairport）流媒体 TCP 端口。",
+      "default": 3689
+    },
+    "music_dir": {
+      "name": "音乐目录",
+      "description": "宿主机上存放音乐库的路径，会被挂载进容器。",
+      "default": ""
+    },
+    "playlist_dir": {
+      "name": "播放列表目录",
+      "description": "宿主机上播放列表的路径。留空则使用 /config 下的默认目录。",
+      "default": ""
+    },
+    "autostart": {
+      "name": "开机自启动",
+      "description": "在 Home Assistant 启动时自动启动本 add-on。",
+      "default": true
+    }
+  }
+}
