@@ -17,8 +17,7 @@ server — inside a supervised container with:
 ```
 owntone/
 ├── config.yaml          # add-on manifest (arch, ports, options schema)
-├── Dockerfile           # builds on top of mpdai/owntone:latest
-├── entrypoint.sh        # stages default config, applies /config/owntone.conf
+├── Dockerfile           # builds on top of lscr.io/linuxserver/daapd:28.10.20250118
 ├── icon.svg             # icon shown in HA add-ons UI
 ├── build.sh             # docker build + tar.gz packaging helper
 ├── translations/
@@ -38,7 +37,7 @@ image and let Home Assistant build the add-on from it.
 ```bash
 cd owntone
 ./build.sh --all
-# produces build/owntone-1.0.0.tar.gz
+# produces build/owntone-1.0.8.tar.gz
 
 # Copy the directory into your HAOS add-ons folder:
 sudo cp -r owntone /mnt/user/addons/local/owntone
@@ -50,7 +49,7 @@ sudo cp -r owntone /mnt/user/addons/local/owntone
 
 ```bash
 export DOCKER_REGISTRY=ghcr.io/yourhandle
-export ADDON_VERSION=1.0.0
+export ADDON_VERSION=1.0.8
 ./build.sh --all --push
 ```
 
@@ -61,10 +60,10 @@ Register the add-on repository URL in HA (typically a Git repo URL or a
 
 1. Start the add-on from HA.
 2. Browse to the web UI URL shown in the add-on card (default
-   `http://<HA-host>:9000/web`).
+   `http://<HA-host>:3689/`).
 3. Add your music by copying files into the `music_dir` you specified at install
-   time (default `/data/owntone`).
-4. In mpdweb, click **Library → Update** to build the tag cache.
+   time (default `/media` inside container, maps to `/mnt/data/supervisor/media` on host).
+4. In the Web UI, click **Library → Update** to build the tag cache.
 
 ## Home Assistant integration
 
@@ -107,45 +106,67 @@ data:
   message: Hello from Home Assistant, playing through OwnTone.
 ```
 
-## Configuration (mpd.conf)
+## Configuration
 
-A sane default `mpd.conf` is written on the **first** start to
-`/etc/mpd.conf`. If you want to customise it:
+The add-on supports the following configuration options:
+
+### Options
+
+- `mpd_port` (default: `6600`) - MPD protocol TCP port
+- `daap_port` (default: `3689`) - DAAP/Web UI TCP port
+- `music_dir` (default: `/media`) - Music library directory
+- `playlist_dir` (default: `/media`) - Playlist directory
+- `admin_password` (default: `""`) - Web UI admin password
+- `autostart` (default: `false`) - Start add-on when HA starts
+
+### Admin password
+
+The Web UI (port 3689) requires a password for authentication. By default, the
+password is `changeme`. To change it:
 
 1. Stop the add-on.
-2. In the add-on's advanced settings (config.yaml's `options`), set
-   `config_dir` to a file on the host, e.g. `/mnt/user/addons/owntone.conf`.
-3. Create that file with your `mpd.conf` content.
-4. Start the add-on — `entrypoint.sh` will copy it over the default.
+2. Go to the add-on's configuration page.
+3. Set the `admin_password` option to your desired password.
+4. Start the add-on.
+
+If you leave `admin_password` empty, the default password `changeme` will be used.
+
+> **Note**: If you access the Web UI from within trusted networks (LAN CIDR
+> `192.168.0.0/24`), authentication is not required. The password is only needed
+> when accessing from outside trusted networks.
 
 ## Firewall / networking
 
 By default OwnTone binds to `0.0.0.0` inside the container. HA's add-on
 networking restricts inbound access from the host (`172.30.0.0/8`) to the
-ports declared in `config.yaml` (6600, 6601, 9000). If you want Other LAN
-devices to connect directly:
+ports declared in `config.yaml` (6600, 3689, 3688).
 
-- Set the add-on's network mode to `host` in its settings, **or**
-- Use port forwarding on the HA host to the add-on's host-side port.
+### Trusted networks
 
-Restrict which hosts can connect by setting the `mpd_interface_whitelist`
-option (e.g. `192.168.0.0/16;10.0.0.0/8`).
+The add-on is configured to trust the LAN CIDR `192.168.0.0/24`. Devices within
+this network range can access the Web UI without authentication.
+
+To access the Web UI from outside trusted networks:
+
+1. Set the `admin_password` option to a secure password.
+2. Forward port 3689 on your router/firewall.
+3. Access via `http://<your-external-ip>:3689`.
 
 ## Architecture support
 
-`amd64`, `armv7`, `armhf`, `aarch64` — same as the base `mpdai/owntone` image.
+`aarch64`, `amd64`
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| `mpd` won't start, "bind: Address already in use" | Another mpd is running. Stop it or change `MPD_PORT`. |
-| HA mpd integration can't connect | Make sure the add-on is running and the `mpd_interface_whitelist` allows HA's docker bridge (`172.30.0.0/8`). |
-| Web UI 404 | The `mpd-httpd` process serves from `/web`; confirm `httpd_root` option is `/web`. |
-| No audio output | Enable PulseAudio output in the options, and make sure the HA host has PulseAudio working. |
-| Library is empty | Use **Library → Update** in mpdweb, or wait for `auto_update` (30 min interval by default). |
+| `mpd` won't start, "bind: Address already in use" | Another mpd is running. Stop it or change `mpd_port`. |
+| HA mpd integration can't connect | Make sure the add-on is running and the HA host can reach port 6600. |
+| Web UI 401 Unauthorized | Set `admin_password` or access from within trusted networks. |
+| No audio output | Enable `audio: true` in config.yaml and ensure PulseAudio is working. |
+| Library is empty | Use **Library → Update** in the Web UI, or wait for `auto_update`. |
 
 ## License
 
 This add-on is distributed under the same terms as OwnTone (Apache-2.0).
-The base image `mpdai/owntone` is by [mpdai](https://github.com/mpdai/owntone).
+The base image `lscr.io/linuxserver/daapd` is by [LinuxServer.io](https://linuxserver.io).

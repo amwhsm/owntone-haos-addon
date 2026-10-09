@@ -17,7 +17,7 @@ RUN sed -i 's|/usr/sbin/owntone -f|/usr/sbin/owntone -f -w /usr/share/owntone/ht
  && cat >> /etc/s6-overlay/s6-rc.d/init-daapd-config/run << 'EOF'
 # Override admin_password if ADMIN_PASSWORD env var is set
 if [ -n "${ADMIN_PASSWORD:-}" ]; then
-    sed -i "s/admin_password = .*/admin_password = \"$ADMIN_PASSWORD\"/" /etc/owntone.conf.orig
+    sed -i "s|admin_password = \".*\"|admin_password = \"$ADMIN_PASSWORD\"|" /etc/owntone.conf.orig
     echo "Admin password overridden via ADMIN_PASSWORD env var"
 else
     echo "Admin password not set, using default"
