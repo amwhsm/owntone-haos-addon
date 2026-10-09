@@ -22,6 +22,11 @@
       "description": "Host path for playlists. Leave empty to use the default under /config.",
       "default": ""
     },
+    "admin_password": {
+      "name": "Admin password",
+      "description": "Password for the Web UI (port 3689). Leave empty to use the default 'changeme'. Change it if you access the Web UI from outside trusted networks.",
+      "default": ""
+    },
     "autostart": {
       "name": "Auto start",
       "description": "Start the add-on when Home Assistant starts.",

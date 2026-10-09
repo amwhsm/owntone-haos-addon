@@ -3,15 +3,14 @@
 A HAOS add-on that runs [OwnTone](https://owntone.org/) — the formerly **MPD** music
 server — inside a supervised container with:
 
-- **mpd protocol on port 6600** — connect from HA's mpd integration, mpdroid,
+- **MPD protocol on port 6600** — connect from HA's mpd integration, mpdroid,
   ncmpc, or any other mpd client.
-- **mpdweb web UI on port 9000** — a browser client bundled with OwnTone.
-- **Replaygain on port 6601**.
-- **PulseAudio socket** — HA can play audio *through* OwnTone on its Home Speakers
-  via the `mpd` integration's "custom player" mechanism, or from HA TTS by adding
-  `media_source://http://<ha>:9000/web/owntone.mp3` (see README's *TTS via mpdweb*).
-- Music directory exposed at `/data/owntone` on the container; mount any host
-  folder you like into `music_dir` at add-on install time.
+- **Web UI on port 3689** — browser-based music library manager (same port as DAAP).
+- **DAAP protocol on port 3689** — stream to Apple Music / iTunes via AirPlay.
+- **HA ingress sidebar** — Web UI appears as a sidebar panel in the HA dashboard.
+- **Configurable admin password** — set via the `admin_password` option in the
+  add-on's configuration. Leave empty to use the default password `changeme`.
+- Music directory at `/media` inside the container (host: `/mnt/data/supervisor/media`).
 
 ## Layout
 

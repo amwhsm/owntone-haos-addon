@@ -22,6 +22,11 @@
       "description": "宿主机上播放列表的路径。留空则使用 /config 下的默认目录。",
       "default": ""
     },
+    "admin_password": {
+      "name": "管理员密码",
+      "description": "Web UI（3689 端口）的登录密码。留空则使用默认密码 changeme。如从非受信网络访问 Web UI，建议修改密码。",
+      "default": ""
+    },
     "autostart": {
       "name": "开机自启动",
       "description": "在 Home Assistant 启动时自动启动本 add-on。",
