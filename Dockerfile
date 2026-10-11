@@ -13,6 +13,8 @@ RUN sed -i 's|/usr/sbin/owntone -f|/usr/sbin/owntone -f -w /usr/share/owntone/ht
     /etc/owntone.conf.orig \
  && sed -i 's#{ "lan" }#{ "192.168.0.0/24" }#' \
     /etc/s6-overlay/s6-rc.d/init-daapd-config/run \
+ # Trust X-Forwarded-For header so trusted_networks matching works behind HA ingress
+ && sed -i 's/^remote_ip_source = .*/remote_ip_source = { "X-Forwarded-For" }/' /etc/owntone.conf.orig \
  # Add admin_password override logic to init script (runs on container start)
  && cat >> /etc/s6-overlay/s6-rc.d/init-daapd-config/run << 'EOF'
 # Override admin_password if ADMIN_PASSWORD env var is set
@@ -30,7 +32,9 @@ EOF
  && grep "directories" /etc/owntone.conf.orig \
  && echo "3. trusted_networks set to LAN:" \
  && grep "trusted_networks" /etc/s6-overlay/s6-rc.d/init-daapd-config/run \
- && echo "4. Admin password override logic added:" \
+ && echo "4. remote_ip_source set to X-Forwarded-For:" \
+ && grep "remote_ip_source" /etc/owntone.conf.orig \
+ && echo "5. Admin password override logic added:" \
  && tail -10 /etc/s6-overlay/s6-rc.d/init-daapd-config/run
 
 EXPOSE 6600 3689 3688
